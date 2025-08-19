@@ -297,6 +297,95 @@ function runPhishingScan(){
     return prediction;
 }
 
+// Auto-scan function that runs when page loads
+function autoScan() {
+    // Wait a bit for page to fully load
+    setTimeout(function() {
+        var result = runPhishingScan();
+        
+        // Create a notification banner instead of alert
+        var banner = document.createElement('div');
+        banner.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999999;
+            padding: 15px 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideDown 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        `;
+        
+        if (result == 1) {
+            // Phishing detected - red banner
+            banner.style.background = '#dc2626';
+            banner.style.color = 'white';
+            banner.style.borderBottom = '3px solid #991b1b';
+            banner.innerHTML = `
+                <span style="font-size: 20px;">🚨</span>
+                <div>
+                    <strong>PHISHING DETECTED!</strong><br>
+                    This page appears to be malicious. Do not enter any personal information.
+                </div>
+                <button onclick="this.parentElement.remove()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-left: 10px;">✕</button>
+            `;
+        } else {
+            // Safe page - green banner
+            banner.style.background = '#059669';
+            banner.style.color = 'white';
+            banner.style.borderBottom = '3px solid #047857';
+            banner.innerHTML = `
+                <span style="font-size: 20px;">✅</span>
+                <div>
+                    <strong>SAFE PAGE DETECTED!</strong><br>
+                    No phishing threats found on this page.
+                </div>
+                <button onclick="this.parentElement.remove()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-left: 10px;">✕</button>
+            `;
+        }
+        
+        // Add CSS animation
+        var style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { transform: translateY(-100%); }
+                to { transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Add banner to page
+        document.body.appendChild(banner);
+        
+        // Auto-remove banner after 8 seconds
+        setTimeout(function() {
+            if (banner.parentElement) {
+                banner.style.animation = 'slideUp 0.5s ease-out';
+                style.textContent += `
+                    @keyframes slideUp {
+                        from { transform: translateY(0); }
+                        to { transform: translateY(-100%); }
+                    }
+                `;
+                setTimeout(function() {
+                    if (banner.parentElement) {
+                        banner.remove();
+                    }
+                }, 500);
+            }
+        }, 8000);
+        
+    }, 2000); // Wait 2 seconds for page to load
+}
+
 // Listen for scan requests from popup and execute phishing detection
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
     if (message && message.type === "SCAN_PAGE"){
@@ -304,13 +393,20 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
         sendResponse({ prediction: result });
         // Show alert based on detection result
         if (result == 1){
-            alert("Warning: Phishing detected!!");
+            alert("🚨 WEB SENTINEL ALERT 🚨\n\nPHISHING DETECTED!\n\nThis page appears to be malicious and may be attempting to steal your information.\n\n⚠️  WARNING: Do not enter any personal information, passwords, or credit card details on this page.\n\n🔒 For your safety, consider closing this tab immediately.");
         }
         else if (result == -1){
-            alert("No phishing detected");
+            alert("✅ WEB SENTINEL SCAN COMPLETE ✅\n\nSAFE PAGE DETECTED!\n\nNo phishing threats were found on this page.\n\n🛡️  This page appears to be legitimate and safe to use.");
         }
     }
 });
+
+// Auto-scan when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoScan);
+} else {
+    autoScan();
+}
 
 
 

@@ -4,14 +4,226 @@
 	<meta charset="utf-8">
 	<title>Web Sentinel</title>
 	<style>
-		body{min-width:220px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:12px}
-		button{width:100%;padding:8px 10px}
-		#status{margin-top:10px;font-size:12px}
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		
+		body {
+			width: 320px;
+			min-height: 280px;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: #ffffff;
+			color: #333333;
+			overflow: hidden;
+		}
+		
+		.header {
+			background: #f8f9fa;
+			padding: 20px;
+			text-align: center;
+			border-bottom: 1px solid #e9ecef;
+		}
+		
+		.logo {
+			width: 48px;
+			height: 48px;
+			margin: 0 auto 10px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		
+		.logo img {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+		}
+		
+		.title {
+			font-size: 18px;
+			font-weight: 600;
+			margin-bottom: 5px;
+		}
+		
+		.subtitle {
+			font-size: 12px;
+			opacity: 0.8;
+		}
+		
+		.auto-scan-info {
+			background: #f0f9ff;
+			border: 1px solid #0ea5e9;
+			border-radius: 10px;
+			padding: 15px;
+			margin-bottom: 20px;
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+		
+		.info-icon {
+			font-size: 24px;
+			color: #0ea5e9;
+		}
+		
+		.info-text {
+			font-size: 13px;
+			color: #0c4a6e;
+			line-height: 1.4;
+		}
+		
+		.content {
+			padding: 20px;
+		}
+		
+		.scan-button {
+			width: 100%;
+			padding: 15px;
+			background: #1e3a8a;
+			border: none;
+			border-radius: 12px;
+			color: white;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+			position: relative;
+			overflow: hidden;
+		}
+		
+		.scan-button:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+		}
+		
+		.scan-button:active {
+			transform: translateY(0);
+		}
+		
+		.scan-button.loading {
+			background: #3b82f6;
+			pointer-events: none;
+		}
+		
+		.scan-button.loading::after {
+			content: '';
+			position: absolute;
+			width: 20px;
+			height: 20px;
+			top: 50%;
+			left: 50%;
+			margin-left: -10px;
+			margin-top: -10px;
+			border: 2px solid transparent;
+			border-top: 2px solid white;
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+		}
+		
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+		
+		.status-container {
+			margin-top: 20px;
+			min-height: 60px;
+		}
+		
+		.status {
+			padding: 15px;
+			border-radius: 10px;
+			font-size: 14px;
+			font-weight: 500;
+			text-align: center;
+			opacity: 0;
+			transform: translateY(20px);
+			transition: all 0.3s ease;
+		}
+		
+		.status.show {
+			opacity: 1;
+			transform: translateY(0);
+		}
+		
+		.status.safe {
+			background: #d1fae5;
+			border: 1px solid #10b981;
+			color: #065f46;
+		}
+		
+		.status.danger {
+			background: #fee2e2;
+			border: 1px solid #ef4444;
+			color: #991b1b;
+		}
+		
+		.status.info {
+			background: #dbeafe;
+			border: 1px solid #3b82f6;
+			color: #1e40af;
+		}
+		
+		.status.error {
+			background: #fce7f3;
+			border: 1px solid #ec4899;
+			color: #9d174d;
+		}
+		
+		.status-icon {
+			font-size: 24px;
+			margin-bottom: 8px;
+			display: block;
+		}
+		
+		.footer {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			padding: 10px 20px;
+			background: #f8f9fa;
+			text-align: center;
+			font-size: 10px;
+			color: #6c757d;
+			border-top: 1px solid #e9ecef;
+		}
 	</style>
 </head>
 <body>
-	<button id="scan">Scan this page</button>
-	<div id="status"></div>
+	<div class="header">
+		<div class="logo">
+			<img src="detective.png" alt="Web Sentinel Logo">
+		</div>
+		<div class="title">Web Sentinel</div>
+		<div class="subtitle">AI-Powered Security Scanner</div>
+	</div>
+	
+	<div class="content">
+		<div class="auto-scan-info">
+			<div class="info-icon">🛡️</div>
+			<div class="info-text">
+				<strong>Auto-Scanning Enabled</strong><br>
+				Pages are automatically scanned when you visit them
+			</div>
+		</div>
+		
+		<button id="scan" class="scan-button">
+			🔍 Manual Scan
+		</button>
+		
+		<div class="status-container">
+			<div id="status" class="status"></div>
+		</div>
+	</div>
+	
+	<div class="footer">
+		Powered by Machine Learning • v0.1
+	</div>
+	
 	<script src="popup.js"></script>
 </body>
 </html>
